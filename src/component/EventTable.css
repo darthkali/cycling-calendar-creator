@@ -5,20 +5,68 @@ table {
 }
 
 th, td {
-    border: 1px solid #ddd;
     padding: 8px;
-    text-align: left;
+    text-align: center;
 }
 
 th {
-    background-color: #f2f2f2;
+    background:none
+
 }
 
-input[type="text"] {
-    width: 100%;
+.input-common {
     padding: 6px;
     box-sizing: border-box;
+    text-align: center;
+    border-radius: 50px;
+    background-color: rgba(79, 255, 176, 0.33);
+    border: none;
+    font-weight: bold;
 }
+
+
+input::placeholder {
+    color: #c1c1c1;
+    font-style: italic;
+    font-weight: normal;
+    font-size: 14px;
+    opacity: 0.5;
+}
+
+
+.input-stage {
+    width: 6ch;
+}
+
+.input-stage {
+    width: 6ch;
+}
+
+.input-from,
+.input-to {
+    width: 30ch;
+}
+
+.input-date {
+    width: 13ch;
+}
+
+.input-start-time,
+.input-end-time {
+    width: 10ch;
+}
+
+.input-kilometers {
+    width: 6ch;
+}
+
+.input-type{
+    width: 19ch;
+}
+.input-mountain-finish {
+    width: 2ch;
+}
+
 
 button {
     border-radius: 8px;
@@ -27,7 +75,7 @@ button {
     font-size: 1em;
     font-weight: 500;
     font-family: inherit;
-    background-color: #1a1a1a;
+    background-color: #07816a;
     cursor: pointer;
     transition: border-color 0.25s;
 }
@@ -42,16 +90,43 @@ button:focus-visible {
 }
 
 button.delete {
-    color: red;
-    background: none;
+    background-color: #d90000;
     border: none;
     cursor: pointer;
+    color: #ffffff;
+    padding: 8px
 }
 
 button.delete:hover {
-    color: darkred;
+    background-color: darkred;
 }
 
-.red-text {
-    color: red;
+.input-container {
+    margin-bottom: 1em;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5em;
+}
+
+.input-group label {
+    margin-right: 1em;
+    width: 100px;
+    text-align: right;
+    font-weight: bold;
+}
+
+.input-name{
+    font-weight: normal;
+    text-align: left;
+}
+.input-description {
+    width: 300ch;
+    height: 4ch;
+    font-weight: normal;
+    text-align: left;
 }
