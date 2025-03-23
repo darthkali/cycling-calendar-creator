@@ -1,5 +1,5 @@
-# PCRCG 
-Pro Cycling Race Calendar Generator
+# CCC 
+Cycling Calendar Creator
 
 ## Features
 - create an event like the Tour de France
