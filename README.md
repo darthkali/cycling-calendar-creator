@@ -1,5 +1,5 @@
 # CCC - Cycling Calendar Creator
-
+![logo.png](assets/images/logo.png) (logo was created with mistral.ai)
 ## Features
 - create an event like the Tour de France
 - add stages
