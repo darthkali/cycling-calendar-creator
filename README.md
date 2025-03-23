@@ -1,5 +1,4 @@
-# CCC 
-Cycling Calendar Creator
+# CCC - Cycling Calendar Creator
 
 ## Features
 - create an event like the Tour de France
