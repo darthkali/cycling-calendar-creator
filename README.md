@@ -1,50 +1,27 @@
-# React + TypeScript + Vite
+# Bike Sports Calendar Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Features
+- create an event like the Tour de France
+- add stages
+- select date and time
+- add the type like Flat- Hill- Mountain- and TimeTrail-stage
+- is it a mountain finish
+- add a description
+- export / import as json to work on it later
+- create the calendar-file als .ics
 
-Currently, two official plugins are available:
+![bike-sports-calendar-planner.png](assets/images/bike-sports-calendar-planner.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This is how the export could look like:
+![calendar-export.png](assets/images/calendar-export.png)
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Start / Install
+Currently, there is no other option as to run it wirh vite locally.
+Start die app by open your terminal, go into the main directory and use the following commandf:
+```
+vite
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+In the future I will also add a docker-image.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
