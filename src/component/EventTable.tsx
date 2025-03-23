@@ -1,31 +1,19 @@
-import {useState, useEffect} from 'react';
-import DatePicker from 'react-datepicker';
+// src/components/EventTable.tsx
+import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import {registerLocale} from 'react-datepicker';
-import enGB from 'date-fns/locale/en-GB';
+import { registerLocale } from 'react-datepicker';
+import { enGB } from 'date-fns/locale/en-GB';
 import './EventTable.css';
+import EventRow from './EventRow';
+import {EventType} from '../types/EventType';
+import Event  from '../types/Event';
+import { exportToICS, exportToJson, importFromJson } from '../utils/ExportUtils';
+import { areAllEventRequiredFieldsFilled, areRequiredFieldsFilled } from '../utils/EventValidation';
+import { FaRoad } from "react-icons/fa";
 
 registerLocale('en-GB', enGB);
 
-enum EventType {
-    HILL = 'Huegeletappe',
-    FLAT = 'Flachetappe',
-    MOUNTAIN = 'Bergetappe'
-}
-
-type Event = {
-    stage: string;
-    date: Date | null;
-    startTime: Date | null;
-    endTime: Date | null;
-    from: string;
-    to: string;
-    kilometers: string;
-    type: EventType;
-    mountainFinish: boolean;
-};
-
-const EventTable = () => {
+const EventTable: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([
         {
             stage: '1',
@@ -35,7 +23,7 @@ const EventTable = () => {
             from: '',
             to: '',
             kilometers: '',
-            type: EventType.HILL,
+            type: EventType.FLAT,
             mountainFinish: false
         }
     ]);
@@ -53,7 +41,7 @@ const EventTable = () => {
                 from: '',
                 to: '',
                 kilometers: '',
-                type: EventType.HILL,
+                type: EventType.FLAT,
                 mountainFinish: false
             }]);
         }
@@ -65,19 +53,18 @@ const EventTable = () => {
         setEvents(newEvents);
     };
 
-    const areRequiredFieldsFilled = (event: Event) => {
-        return event.date && event.startTime && event.endTime;
-    };
-
     const addRow = () => {
         const lastEvent = events[events.length - 1];
         if (!areRequiredFieldsFilled(lastEvent)) {
-            if (!window.confirm('Du hast Datum, Startzeit und oder Endzeit in der letzten Zeile nicht ausfefüllt. Das solltest du aber tun, da es dir das ausfüllen erleichtert. Willst du dennoch eine neue Zeile einfügen?')) {
+            if (!window.confirm('Du hast Datum, Startzeit und/oder Endzeit in der letzten Zeile nicht ausgefüllt. Willst du dennoch eine neue Zeile einfügen?')) {
                 return;
             }
         }
 
-        const newDate = lastEvent && lastEvent.date ? new Date(lastEvent.date.getTime() + 86400000) : null; // Add one day (86400000 ms)
+        const newDate = lastEvent && lastEvent.date ? new Date(lastEvent.date.getTime() + 86400000) : null; // Einen Tag hinzufügen
+        const newStartTime = lastEvent?.startTime ? new Date(lastEvent.startTime.getTime()) : null;
+        const newEndTime = lastEvent?.endTime ? new Date(lastEvent.endTime.getTime()) : null;
+
         let lastStage = 0;
         for (let i = events.length - 1; i >= 0; i--) {
             const stage = parseInt(events[i].stage);
@@ -87,17 +74,19 @@ const EventTable = () => {
             }
         }
         const newStage = (lastStage + 1).toString();
+
         const newEvent: Event = {
             stage: newStage,
             date: newDate,
-            startTime: lastEvent ? lastEvent.startTime : null,
-            endTime: lastEvent ? lastEvent.endTime : null,
+            startTime: newStartTime,
+            endTime: newEndTime,
             from: '',
             to: '',
             kilometers: '',
             type: EventType.FLAT,
             mountainFinish: false
         };
+
         setEvents([...events, newEvent]);
     };
 
@@ -114,8 +103,36 @@ const EventTable = () => {
         setEvents(newEvents);
     };
 
-    const exportToICS = () => {
-        // Implement .ics export logic here
+    const getIconForEventType = (type: EventType): string => {
+        switch (type) {
+            case EventType.MOUNTAIN:
+                return '🌋';
+            case EventType.HILL:
+                return '🗻';
+            case EventType.FLAT:
+                return '🛣️';
+            case EventType.TIME_TRAIL:
+                return '⏱️';
+            default:
+                return '';
+        }
+    };
+
+    const handleExportToICS = () => {
+        exportToICS({
+            events,
+            name,
+            description,
+            getIconForEventType
+        });
+    };
+
+    const handleExportToJson = () => {
+        exportToJson(name, description, events);
+    };
+
+    const handleImportFromJson = (event: React.ChangeEvent<HTMLInputElement>) => {
+        importFromJson(event, setName, setDescription, setEvents);
     };
 
     return (
@@ -161,112 +178,25 @@ const EventTable = () => {
                 </thead>
                 <tbody>
                 {events.map((event, index) => (
-                    <tr key={index}>
-                        <td>
-                            <input
-                                type="text"
-                                className="input-stage input-common"
-                                value={event.stage}
-                                onChange={(e) => handleChange(index, 'stage', e.target.value)}
-                            />
-                        </td>
-                        <td>
-                            <DatePicker
-                                selected={event.date}
-                                onChange={(date) => handleChange(index, 'date', date)}
-                                dateFormat="dd.MM.yyyy"
-                                placeholderText="00.00.0000"
-                                locale="en-GB"
-                                className="input-date input-common"
-                            />
-                        </td>
-                        <td>
-                            <DatePicker
-                                selected={event.startTime}
-                                onChange={(time) => handleChange(index, 'startTime', time)}
-                                showTimeSelect
-                                showTimeSelectOnly
-                                placeholderText="00:00"
-                                timeIntervals={5}
-                                timeCaption="Time"
-                                dateFormat="HH:mm"
-                                timeFormat="HH:mm"
-                                locale="en-GB"
-                                className="input-start-time input-common"
-                            />
-                        </td>
-                        <td>
-                            <DatePicker
-                                selected={event.endTime}
-                                onChange={(time) => handleChange(index, 'endTime', time)}
-                                showTimeSelect
-                                showTimeSelectOnly
-                                placeholderText="00:00"
-                                timeIntervals={5}
-                                timeCaption="Time"
-                                dateFormat="HH:mm"
-                                timeFormat="HH:mm"
-                                locale="en-GB"
-                                className="input-end-time input-common"
-                            />
-                        </td>
-                        <td>
-                            <input
-                                type="text"
-                                className="input-from input-common"
-                                placeholder={"Berlin"}
-                                value={event.from}
-                                onChange={(e) => handleChange(index, 'from', e.target.value)}
-                            />
-                        </td>
-                        <td>
-                            <input
-                                type="text"
-                                className="input-to input-common"
-                                placeholder={"Paris"}
-                                value={event.to}
-                                onChange={(e) => handleChange(index, 'to', e.target.value)}
-                            />
-                        </td>
-                        <td>
-                            <input
-                                type="text"
-                                className="input-kilometers input-common"
-                                placeholder={"0"}
-                                value={event.kilometers}
-                                onChange={(e) => handleChange(index, 'kilometers', e.target.value)}
-                            />
-                        </td>
-                        <td>
-                            <select
-                                className="input-type input-common"
-                                value={event.type}
-                                onChange={(e) => handleChange(index, 'type', e.target.value)}
-                            >
-                                {Object.values(EventType).map((type) => (
-                                    <option key={type} value={type}>{type}</option>
-                                ))}
-                            </select>
-                        </td>
-                        <td>
-                            <input
-                                type="checkbox"
-                                className="input-mountain-finish input-common"
-                                checked={event.mountainFinish}
-                                onChange={(e) => handleChange(index, 'mountainFinish', e.target.checked)}
-                            />
-                        </td>
-                        <td>
-                            <button onClick={() => deleteRow(index)} className="delete">
-                                <i className="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
+                    <EventRow
+                        key={index}
+                        event={event}
+                        index={index}
+                        handleChange={handleChange}
+                        deleteRow={deleteRow}
+                    />
                 ))}
                 </tbody>
             </table>
             <button onClick={addRow}>Add Row</button>
-            <button onClick={exportToICS}>Export to .ics</button>
+            <button
+                onClick={handleExportToICS}
+                disabled={!areAllEventRequiredFieldsFilled(events)}
+            >
+                Export to .ics
+            </button>
+            <button onClick={handleExportToJson}>Export to JSON</button>
+            <input type="file" accept=".json" onChange={handleImportFromJson} />
         </div>
     );
 };
