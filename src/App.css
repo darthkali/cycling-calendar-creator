@@ -23,3 +23,11 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
+
+.caption{
+  display:inline-flex;
+  align-items: center;
+}
+.logo{
+  margin-right: 20px;
+}
