@@ -9,7 +9,6 @@ import {EventType} from '../types/EventType';
 import Event  from '../types/Event';
 import { exportToICS, exportToJson, importFromJson } from '../utils/ExportUtils';
 import { areAllEventRequiredFieldsFilled, areRequiredFieldsFilled } from '../utils/EventValidation';
-import { FaRoad } from "react-icons/fa";
 
 registerLocale('en-GB', enGB);
 

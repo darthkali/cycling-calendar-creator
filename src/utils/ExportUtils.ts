@@ -21,7 +21,8 @@ export const exportToICS = ({
         .filter(event => event.date && event.startTime && event.endTime)
         .map(event => {
             const icon = getIconForEventType(event.type);
-            const title = `${icon}${name}: ${event.stage}. Etappe: ${event.from} - ${event.to}, ${event.kilometers} km`;
+            const mountainFinish = event.mountainFinish ? ' ⛰️ Bergankunft' : ''
+            const title = `${icon}${name}: ${event.stage}. Etappe: ${event.from} - ${event.to}, ${event.kilometers} km${mountainFinish}`;
 
             const start: DateTime = convertDateAndTimeToDateTime(event.date!, event.startTime!);
             const end: DateTime = convertDateAndTimeToDateTime(event.date!, event.endTime!);
