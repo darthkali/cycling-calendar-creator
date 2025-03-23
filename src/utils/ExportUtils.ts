@@ -27,11 +27,13 @@ export const exportToICS = ({
             const start: DateTime = convertDateAndTimeToDateTime(event.date!, event.startTime!);
             const end: DateTime = convertDateAndTimeToDateTime(event.date!, event.endTime!);
 
+            const editedDescription = `🌋 = Bergetappe\n🗻 = Hügeletappe\n🛣️ = Flachetappe\n⏱️ = Zeitfahren\n\n${description}`
+
             return {
                 title,
                 start,
                 end,
-                description,
+                description: editedDescription,
                 location: `${event.from} - ${event.to}`,
             };
         });
