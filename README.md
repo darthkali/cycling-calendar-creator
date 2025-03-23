@@ -1,4 +1,5 @@
-# Bike Sports Calendar Planner
+# PCRCG 
+Pro Cycling Race Calendar Generator
 
 ## Features
 - create an event like the Tour de France
