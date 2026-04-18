@@ -1,33 +1,26 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
+/* ============================================================
+   App – Layout & Header
+   ============================================================ */
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  /*font-weight: 400;*/
-}
-
-body {
-  margin: 0;
+.caption {
   display: flex;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-.caption{
-  display:inline-flex;
   align-items: center;
+  gap: var(--space-4);
+  padding-bottom: var(--space-6);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
 }
-.logo{
-  margin-right: 20px;
+
+.caption .logo {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.caption h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+  margin: 0;
 }

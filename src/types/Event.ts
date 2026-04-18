@@ -1,6 +1,7 @@
 import {EventType} from './EventType';
 
 type Event = {
+    id: string;
     stage: string;
     date: Date | null;
     startTime: Date | null;

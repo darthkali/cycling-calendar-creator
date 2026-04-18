@@ -1,4 +1,3 @@
-// src/utils/EventValidation.ts
 import Event from '../types/Event';
 
 export const areRequiredFieldsFilled = (event: Event): boolean => {

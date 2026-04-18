@@ -1,132 +1,282 @@
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1em;
+/* ============================================================
+   EventTable – Component-specific layout
+   ============================================================ */
+
+/* --- Table chrome ------------------------------------------ */
+.event-table {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: var(--space-6);
 }
 
-th, td {
-    padding: 8px;
-    text-align: center;
+.event-table thead {
+  background-color: var(--color-surface-raised);
 }
 
-th {
-    background:none
-
+.event-table th {
+  padding: var(--space-3) var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  text-align: center;
+  white-space: nowrap;
 }
 
-.input-common {
-    padding: 6px;
-    box-sizing: border-box;
-    text-align: center;
-    border-radius: 50px;
-    background-color: rgba(79, 255, 176, 0.33);
-    border: none;
-    font-weight: bold;
+.event-table td {
+  padding: var(--space-2);
+  text-align: center;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
 }
 
-
-input::placeholder {
-    color: #c1c1c1;
-    font-style: italic;
-    font-weight: normal;
-    font-size: 14px;
-    opacity: 0.5;
+.event-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
+.event-table tbody tr:hover {
+  background-color: var(--color-surface-hover);
+}
 
+/* --- Compact inputs inside the table ----------------------- */
+.event-table .input {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  border-radius: var(--radius-md);
+}
+
+.event-table select.input {
+  text-align: left;
+}
+
+.event-table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* --- Drag handle ------------------------------------------- */
+.col-handle {
+  width: 40px;
+}
+
+.drag-handle {
+  background: none;
+  border: none;
+  cursor: grab;
+  color: var(--color-text-tertiary);
+  padding: var(--space-1);
+  font-size: var(--font-size-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+
+.drag-handle:hover {
+  color: var(--color-text-secondary);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-row-active {
+  background-color: var(--color-primary-muted);
+  box-shadow: var(--shadow-md);
+}
+
+/* --- Disabled stage input ---------------------------------- */
+.event-table .input:disabled {
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  cursor: default;
+  opacity: 0.8;
+}
+
+/* --- Date conflict indicator ------------------------------- */
+.date-conflict td {
+  background-color: var(--color-error-light);
+}
+
+.date-cell {
+  position: relative;
+}
+
+.input-warning {
+  border-color: var(--color-error) !important;
+}
+
+.date-conflict-icon {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--font-size-sm);
+  cursor: default;
+}
+
+.date-conflict-icon[data-tooltip] {
+  position: absolute;
+}
+
+.date-conflict-icon[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: var(--color-surface);
+  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 80ms ease;
+}
+
+.date-conflict-icon[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* --- Column widths ----------------------------------------- */
 .input-stage {
-    width: 6ch;
-}
-
-.input-stage {
-    width: 6ch;
-}
-
-.input-from,
-.input-to {
-    width: 30ch;
+  width: 6ch;
 }
 
 .input-date {
-    width: 13ch;
+  width: 13ch;
 }
 
 .input-start-time,
 .input-end-time {
-    width: 10ch;
+  width: 10ch;
+}
+
+.input-from,
+.input-to {
+  width: 24ch;
 }
 
 .input-kilometers {
-    width: 6ch;
+  width: 6ch;
 }
 
-.input-type{
-    width: 19ch;
+.input-type {
+  width: 19ch;
 }
+
 .input-mountain-finish {
-    width: 2ch;
+  width: 2ch;
 }
 
-
-button {
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    background-color: #07816a;
-    cursor: pointer;
-    transition: border-color 0.25s;
-}
-
-button:hover {
-    border-color: #646cff;
-}
-
-button:focus,
-button:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
-}
-
-button.delete {
-    background-color: #d90000;
-    border: none;
-    cursor: pointer;
-    color: #ffffff;
-    padding: 8px
-}
-
-button.delete:hover {
-    background-color: darkred;
-}
-
+/* --- Name & description above the table -------------------- */
 .input-container {
-    margin-bottom: 1em;
-    display: flex;
-    flex-direction: column;
+  margin-bottom: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .input-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5em;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
 }
 
 .input-group label {
-    margin-right: 1em;
-    width: 100px;
-    text-align: right;
-    font-weight: bold;
+  min-width: 100px;
+  text-align: right;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
 }
 
-.input-name{
-    font-weight: normal;
-    text-align: left;
+.input-name {
+  font-weight: var(--font-weight-normal);
+  text-align: left;
+  max-width: 400px;
 }
+
 .input-description {
-    width: 300ch;
-    height: 4ch;
-    font-weight: normal;
+  max-width: 600px;
+  height: 4ch;
+  font-weight: var(--font-weight-normal);
+  text-align: left;
+}
+
+/* --- Action buttons below the table ------------------------ */
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+/* --- DatePicker overrides ---------------------------------- */
+.react-datepicker-wrapper {
+  display: inline-block;
+}
+
+.react-datepicker__input-container input {
+  font-family: var(--font-family);
+}
+
+.react-datepicker-popper {
+  z-index: var(--z-dropdown) !important;
+}
+
+.react-datepicker {
+  font-family: var(--font-family) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.react-datepicker__header {
+  background-color: var(--color-surface-raised) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected,
+.react-datepicker__time-list-item--selected {
+  background-color: var(--color-primary) !important;
+  color: var(--color-text-on-primary) !important;
+}
+
+.react-datepicker__day:hover,
+.react-datepicker__time-list-item:hover {
+  background-color: var(--color-primary-light) !important;
+}
+
+/* --- Responsive -------------------------------------------- */
+@media (max-width: 768px) {
+  .input-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .input-group label {
     text-align: left;
+    min-width: auto;
+  }
+
+  .input-name,
+  .input-description {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .table-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

@@ -1,4 +1,3 @@
-// src/utils/DateTime.ts
 export type DateTime = [number, number, number, number, number];
 
 export const convertDateAndTimeToDateTime = (date: Date, time: Date): DateTime => {

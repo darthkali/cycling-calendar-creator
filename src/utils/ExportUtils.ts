@@ -1,8 +1,7 @@
-// src/utils/ExportUtils.ts
 import { createEvents, EventAttributes } from 'ics';
 import {DateTime, convertDateAndTimeToDateTime, getNow} from './DateTime';
 import Event from '../types/Event';
-import EventType from '../types/EventType';
+import { EventType } from '../types/EventType';
 
 type ExportToICSParams = {
     events: Event[];
@@ -79,8 +78,10 @@ export const importFromJson = (
             const result = e.target?.result as string;
             const data = JSON.parse(result);
 
-            const convertedEvents: Event[] = data.events.map((event: Event) => ({
+            const convertedEvents: Event[] = data.events.map((event: Event, i: number) => ({
                 ...event,
+                id: event.id || crypto.randomUUID(),
+                stage: (i + 1).toString(),
                 date: event.date ? new Date(event.date) : null,
                 startTime: event.startTime ? new Date(event.startTime) : null,
                 endTime: event.endTime ? new Date(event.endTime) : null,

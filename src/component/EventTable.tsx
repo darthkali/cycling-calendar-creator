@@ -1,54 +1,55 @@
-// src/components/EventTable.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { registerLocale } from 'react-datepicker';
 import { enGB } from 'date-fns/locale/en-GB';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import './EventTable.css';
 import EventRow from './EventRow';
 import {EventType} from '../types/EventType';
 import Event  from '../types/Event';
 import { exportToICS, exportToJson, importFromJson } from '../utils/ExportUtils';
 import { areAllEventRequiredFieldsFilled, areRequiredFieldsFilled } from '../utils/EventValidation';
+import AiImportModal from './AiImportModal';
+import { mergeStages } from '../services/aiImportService';
+import type { ImportData } from './AiImportModal';
 
 registerLocale('en-GB', enGB);
 
-const EventTable: React.FC = () => {
-    const [events, setEvents] = useState<Event[]>([
-        {
-            stage: '1',
-            date: null,
-            startTime: null,
-            endTime: null,
-            from: '',
-            to: '',
-            kilometers: '',
-            type: EventType.FLAT,
-            mountainFinish: false
-        }
-    ]);
+function createEvent(stage: string): Event {
+    return {
+        id: crypto.randomUUID(),
+        stage,
+        date: null,
+        startTime: null,
+        endTime: null,
+        from: '',
+        to: '',
+        kilometers: '',
+        type: EventType.FLAT,
+        mountainFinish: false,
+    };
+}
 
+function renumberStages(events: Event[]): Event[] {
+    return events.map((e, i) => ({ ...e, stage: (i + 1).toString() }));
+}
+
+const EventTable: React.FC = () => {
+    const [events, setEvents] = useState<Event[]>([createEvent('1')]);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [showImportModal, setShowImportModal] = useState(false);
 
-    useEffect(() => {
-        if (events.length === 0) {
-            setEvents([{
-                stage: '1',
-                date: null,
-                startTime: null,
-                endTime: null,
-                from: '',
-                to: '',
-                kilometers: '',
-                type: EventType.FLAT,
-                mountainFinish: false
-            }]);
-        }
-    }, [events]);
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    );
 
-    const handleChange = (index: number, field: keyof Event, value: any) => {
+    const handleChange = (index: number, field: keyof Event, value: unknown) => {
         const newEvents = [...events];
-        newEvents[index][field] = value;
+        (newEvents[index] as Record<string, unknown>)[field] = value;
         setEvents(newEvents);
     };
 
@@ -60,30 +61,15 @@ const EventTable: React.FC = () => {
             }
         }
 
-        const newDate = lastEvent && lastEvent.date ? new Date(lastEvent.date.getTime() + 86400000) : null; // Einen Tag hinzufügen
+        const newDate = lastEvent && lastEvent.date ? new Date(lastEvent.date.getTime() + 86400000) : null;
         const newStartTime = lastEvent?.startTime ? new Date(lastEvent.startTime.getTime()) : null;
         const newEndTime = lastEvent?.endTime ? new Date(lastEvent.endTime.getTime()) : null;
 
-        let lastStage = 0;
-        for (let i = events.length - 1; i >= 0; i--) {
-            const stage = parseInt(events[i].stage);
-            if (!isNaN(stage)) {
-                lastStage = stage;
-                break;
-            }
-        }
-        const newStage = (lastStage + 1).toString();
-
         const newEvent: Event = {
-            stage: newStage,
+            ...createEvent((events.length + 1).toString()),
             date: newDate,
             startTime: newStartTime,
             endTime: newEndTime,
-            from: '',
-            to: '',
-            kilometers: '',
-            type: EventType.FLAT,
-            mountainFinish: false
         };
 
         setEvents([...events, newEvent]);
@@ -91,15 +77,22 @@ const EventTable: React.FC = () => {
 
     const deleteRow = (index: number) => {
         const newEvents = events.filter((_, i) => i !== index);
-        let lastStage = 0;
-        for (let i = 0; i < newEvents.length; i++) {
-            const stage = parseInt(newEvents[i].stage);
-            if (!isNaN(stage)) {
-                newEvents[i].stage = (lastStage + 1).toString();
-                lastStage++;
-            }
+        if (newEvents.length === 0) {
+            setEvents([createEvent('1')]);
+            return;
         }
-        setEvents(newEvents);
+        setEvents(renumberStages(newEvents));
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+
+        setEvents(prev => {
+            const oldIndex = prev.findIndex(e => e.id === active.id);
+            const newIndex = prev.findIndex(e => e.id === over.id);
+            return renumberStages(arrayMove(prev, oldIndex, newIndex));
+        });
     };
 
     const getIconForEventType = (type: EventType): string => {
@@ -134,8 +127,20 @@ const EventTable: React.FC = () => {
         importFromJson(event, setName, setDescription, setEvents);
     };
 
+    const handleAiImport = (data: ImportData) => {
+        if (data.name && (data.overwrite.name || !name)) setName(data.name);
+        if (data.description && (data.overwrite.description || !description)) setDescription(data.description);
+        setEvents(prev => renumberStages(mergeStages(prev, data.stages, data.overwrite.columns)));
+    };
+
     return (
         <div>
+            {showImportModal && (
+                <AiImportModal
+                    onClose={() => setShowImportModal(false)}
+                    onImport={handleAiImport}
+                />
+            )}
             <div className="input-container">
                 <div className="input-group">
                     <label htmlFor="name">Name:</label>
@@ -145,7 +150,7 @@ const EventTable: React.FC = () => {
                         placeholder="Name:"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="input-common input-name"
+                        className="input input-name"
                     />
                 </div>
                 <div className="input-group">
@@ -156,46 +161,66 @@ const EventTable: React.FC = () => {
                         placeholder="Beschreibung:"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        className="input-common input-description"
+                        className="input input-description"
                     />
                 </div>
             </div>
-            <table>
-                <thead>
-                <tr>
-                    <th>Etappe</th>
-                    <th>Datum</th>
-                    <th>Startzeit</th>
-                    <th>Endzeit</th>
-                    <th>Von</th>
-                    <th>Nach</th>
-                    <th>Kilometer</th>
-                    <th>Art</th>
-                    <th>Bergankunft</th>
-                    <th>Aktion</th>
-                </tr>
-                </thead>
-                <tbody>
-                {events.map((event, index) => (
-                    <EventRow
-                        key={index}
-                        event={event}
-                        index={index}
-                        handleChange={handleChange}
-                        deleteRow={deleteRow}
-                    />
-                ))}
-                </tbody>
-            </table>
-            <button onClick={addRow}>Add Row</button>
-            <button
-                onClick={handleExportToICS}
-                disabled={!areAllEventRequiredFieldsFilled(events)}
+            <div className="table-actions">
+                <button className="btn btn-secondary" onClick={() => setShowImportModal(true)}>🤖 KI-Import</button>
+                <button className="btn btn-secondary" onClick={addRow}>+ Zeile hinzufügen</button>
+                <button
+                    className="btn btn-primary"
+                    onClick={handleExportToICS}
+                    disabled={!areAllEventRequiredFieldsFilled(events)}
+                >
+                    Export to .ics
+                </button>
+                <button className="btn btn-secondary" onClick={handleExportToJson}>Export to JSON</button>
+                <label className="btn btn-secondary">
+                    <i className="fas fa-upload"></i> JSON Import
+                    <input type="file" accept=".json" onChange={handleImportFromJson} className="sr-only" />
+                </label>
+            </div>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                modifiers={[restrictToVerticalAxis]}
+                onDragEnd={handleDragEnd}
             >
-                Export to .ics
-            </button>
-            <button onClick={handleExportToJson}>Export to JSON</button>
-            <input type="file" accept=".json" onChange={handleImportFromJson} />
+                <table className="event-table">
+                    <thead>
+                    <tr>
+                        <th className="col-handle"></th>
+                        <th>Etappe</th>
+                        <th>Datum</th>
+                        <th>Startzeit</th>
+                        <th>Endzeit</th>
+                        <th>Von</th>
+                        <th>Nach</th>
+                        <th>Kilometer</th>
+                        <th>Art</th>
+                        <th>Bergankunft</th>
+                        <th>Aktion</th>
+                    </tr>
+                    </thead>
+                    <SortableContext items={events.map(e => e.id)} strategy={verticalListSortingStrategy}>
+                        <tbody>
+                        {events.map((event, index) => {
+                            const prevDate = index > 0 ? events[index - 1].date : null;
+                            const hasDateConflict = !!(event.date && prevDate && event.date < prevDate);
+                            return <EventRow
+                                key={event.id}
+                                event={event}
+                                index={index}
+                                hasDateConflict={hasDateConflict}
+                                handleChange={handleChange}
+                                deleteRow={deleteRow}
+                            />;
+                        })}
+                        </tbody>
+                    </SortableContext>
+                </table>
+            </DndContext>
         </div>
     );
 };
