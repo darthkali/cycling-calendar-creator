@@ -29,8 +29,10 @@ Jedes Objekt im stages-Array hat folgende Felder (alle optional, nur wenn erkenn
 - mountainFinish: true oder false (Bergankunft)
 
 Wenn du für ein Feld keine zuverlässige Information findest, lass es weg.
+Achte besonders auf Start- und Endzeiten (startTime, endTime) und extrahiere sie, wann immer sie im Text erkennbar sind.
+Wenn nur eine Startzeit angegeben ist, schätze eine plausible Endzeit basierend auf der Distanz (kilometers): Rechne bei Radetappen mit einer Durchschnittsgeschwindigkeit von etwa 40 km/h und runde auf volle Viertelstunden. Ohne Distanz nimm 4-5 Stunden Fahrzeit an.
 Beispiel-Ausgabe:
-{"name":"Tour de France 2025","description":"Die 112. Austragung der Tour de France.","stages":[{"stage":"1","date":"2025-07-05","from":"Florenz","to":"Rimini","kilometers":"206","type":"Flachetappe","mountainFinish":false}]}`;
+{"name":"Tour de France 2025","description":"Die 112. Austragung der Tour de France.","stages":[{"stage":"1","date":"2025-07-05","startTime":"12:30","endTime":"17:15","from":"Florenz","to":"Rimini","kilometers":"206","type":"Flachetappe","mountainFinish":false}]}`;
 
 export async function callClaudeApi(text: string, apiKey: string): Promise<ImportResult> {
     const controller = new AbortController();

@@ -7,12 +7,14 @@ import './AiImportModal.css';
 
 type ModalState = 'idle' | 'loading' | 'preview' | 'error';
 
-const STAGE_COLUMNS = ['stage', 'date', 'from', 'to', 'kilometers', 'type', 'mountainFinish'] as const;
+const STAGE_COLUMNS = ['stage', 'date', 'startTime', 'endTime', 'from', 'to', 'kilometers', 'type', 'mountainFinish'] as const;
 type StageColumn = typeof STAGE_COLUMNS[number];
 
 const COLUMN_LABELS: Record<StageColumn, string> = {
     stage: 'Etappe',
     date: 'Datum',
+    startTime: 'Start',
+    endTime: 'Ende',
     from: 'Von',
     to: 'Nach',
     kilometers: 'km',
@@ -216,6 +218,8 @@ const AiImportModal: React.FC<Props> = ({ onClose, onImport }) => {
                                         <tr key={i}>
                                             <td><input value={s.stage ?? ''} onChange={e => handlePreviewChange(i, 'stage', e.target.value)} /></td>
                                             <td><input value={s.date ?? ''} placeholder="YYYY-MM-DD" onChange={e => handlePreviewChange(i, 'date', e.target.value)} /></td>
+                                            <td><input value={s.startTime ?? ''} placeholder="HH:MM" onChange={e => handlePreviewChange(i, 'startTime', e.target.value)} /></td>
+                                            <td><input value={s.endTime ?? ''} placeholder="HH:MM" onChange={e => handlePreviewChange(i, 'endTime', e.target.value)} /></td>
                                             <td><input value={s.from ?? ''} onChange={e => handlePreviewChange(i, 'from', e.target.value)} /></td>
                                             <td><input value={s.to ?? ''} onChange={e => handlePreviewChange(i, 'to', e.target.value)} /></td>
                                             <td><input value={s.kilometers ?? ''} onChange={e => handlePreviewChange(i, 'kilometers', e.target.value)} /></td>
